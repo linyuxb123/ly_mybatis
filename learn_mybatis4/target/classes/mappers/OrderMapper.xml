@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- mapper:根标签，namespace：命名空间，随便写，一般保证命名空间唯一 ，为了使用接口动态代理，这里必须是接口的全路径名-->
+<mapper namespace="xyz.linyuxb.dao.OrderMapper">
+    <resultMap id="OrderUserResultMap" type="xyz.linyuxb.pojo.Order" autoMapping="true">
+        <id column="id" property="id"/>
+        <!--association:完成子对象的映射-->
+        <!--property:子对象在父对象中的属性名-->
+        <!--javaType:子对象的java类型-->
+        <!--autoMapping:完成子对象的自动映射，若开启驼峰，则按驼峰匹配-->
+        <association property="user" javaType="xyz.linyuxb.pojo.OrderUser" autoMapping="true">
+            <id column="user_id" property="id"/>
+        </association>
+    </resultMap>
+
+    <!--<resultMap id="OrderUserDetailResultMap" type="com.example.mybatis_learn.pojo.Order" autoMapping="true">
+        <id column="id" property="id"/>
+        &lt;!&ndash;collection:定义子对象集合映射&ndash;&gt;
+        &lt;!&ndash;association:完成子对象的映射&ndash;&gt;
+        &lt;!&ndash;property:子对象在父对象中的属性名&ndash;&gt;
+        &lt;!&ndash;javaType:子对象的java类型&ndash;&gt;
+        &lt;!&ndash;autoMapping:完成子对象的自动映射，若开启驼峰，则按驼峰匹配&ndash;&gt;
+        <association property="user" javaType="com.example.mybatis_learn.pojo.OrderUser" autoMapping="true">
+            <id column="user_id" property="id"/>
+        </association>
+        <collection property="detailList" javaType="List" ofType="com.example.mybatis_learn.pojo.OrderDetail"
+                    autoMapping="true">
+            <id column="detail_id" property="orderId"/>
+        </collection>
+    </resultMap>-->
+
+    <resultMap id="OrderUserDetailResultMap" type="xyz.linyuxb.pojo.Order" autoMapping="true" extends="OrderUserResultMap">
+       <!-- <id column="id" property="id"/>
+        &lt;!&ndash;collection:定义子对象集合映射&ndash;&gt;
+        &lt;!&ndash;association:完成子对象的映射&ndash;&gt;
+        &lt;!&ndash;property:子对象在父对象中的属性名&ndash;&gt;
+        &lt;!&ndash;javaType:子对象的java类型&ndash;&gt;
+        &lt;!&ndash;autoMapping:完成子对象的自动映射，若开启驼峰，则按驼峰匹配&ndash;&gt;
+        <association property="user" javaType="com.example.mybatis_learn.pojo.OrderUser" autoMapping="true">
+            <id column="user_id" property="id"/>
+        </association>-->
+        <collection property="detailList" javaType="List" ofType="xyz.linyuxb.pojo.OrderDetail"
+                    autoMapping="true">
+            <id column="detail_id" property="orderId"/>
+        </collection>
+    </resultMap>
+
+    <!--<resultMap id="OrderUserDetailItemResultMap" type="com.example.mybatis_learn.pojo.Order" autoMapping="true">
+        <id column="id" property="id"/>
+
+        <association property="user" javaType="com.example.mybatis_learn.pojo.OrderUser" autoMapping="true">
+            <id column="user_id" property="id"/>
+        </association>
+        <collection property="detailList" javaType="List" ofType="com.example.mybatis_learn.pojo.OrderDetail" autoMapping="true">
+            <id column="detail_id" property="orderId"/>
+            <association property="item" javaType="com.example.mybatis_learn.pojo.Item" autoMapping="true">
+                <id column="item_id" property="id"/>
+            </association>
+        </collection>
+    </resultMap>-->
+    <resultMap id="OrderUserDetailItemResultMap" type="xyz.linyuxb.pojo.Order" autoMapping="true" extends="OrderUserResultMap">
+        <!--<id column="id" property="id"/>
+
+        <association property="user" javaType="com.example.mybatis_learn.pojo.OrderUser" autoMapping="true">
+            <id column="user_id" property="id"/>
+        </association>-->
+        <collection property="detailList" javaType="List" ofType="xyz.linyuxb.pojo.OrderDetail" autoMapping="true">
+            <id column="detail_id" property="orderId"/>
+            <association property="item" javaType="xyz.linyuxb.pojo.Item" autoMapping="true">
+                <id column="item_id" property="id"/>
+            </association>
+        </collection>
+    </resultMap>
+    <!---->
+    <resultMap id="LazyOrderUserResultMap" type="xyz.linyuxb.pojo.Order" autoMapping="true">
+        <id column="id" property="id"/>
+        <association property="user" javaType="xyz.linyuxb.pojo.OrderUser" autoMapping="true" select="queryUserById" column="user_id"/>
+    </resultMap>
+
+    <select id="queryOrderUserByOrderNumber" resultType="xyz.linyuxb.pojo.Order">
+        select * from tb_order o left join tb_user u on o.user_id=u.id where o.order_number = #{number}
+    </select>
+
+    <select id="queryOrderWithUserByOrderNumber" resultMap="OrderUserResultMap">
+       select * from tb_order o left join tb_user u on o.user_id=u.id where o.order_number = #{number}
+    </select>
+
+    <select id="queryOrderWithUserAndDetailByOrderNumber" resultMap="OrderUserDetailResultMap">
+       select * from tb_order o
+       left join tb_user u on o.user_id=u.id
+       left join tb_orderdetail od on o.id=od.order_id
+       where o.order_number = #{number}
+     </select>
+
+    <select id="queryOrderWithUserAndDetailItemByOrderNumber" resultMap="OrderUserDetailItemResultMap">
+       select * ,od.id as detail_id from tb_order o
+       left join tb_user u on o.user_id=u.id
+       left join tb_orderdetail od on o.id=od.order_id
+       left join tb_item i on od.item_id=i.id
+       where o.order_number = #{number}
+    </select>
+
+    <select id="queryOrderAndUserByOrderNumberLazy" resultMap="LazyOrderUserResultMap">
+       select * from tb_order where order_number=#{number}
+    </select>
+
+    <select id="queryUserById" resultType="xyz.linyuxb.pojo.OrderUser">
+       select * from tb_user where id=#{id}
+    </select>
+
+</mapper>

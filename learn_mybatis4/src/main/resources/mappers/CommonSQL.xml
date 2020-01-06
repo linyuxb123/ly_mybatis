@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CommonSQL">
+    <sql id="commonSql">
+-- 		id as id,
+--        user_name as userName,
+--        password as password,
+--        name as name,
+--        age as age,
+--        birthday as birthday,
+--        sex as sex,
+--        created as created,
+--        updated as updated
+
+        id ,
+       user_name,
+       password,
+       name,
+       age,
+       birthday,
+       sex,
+       created,
+       updated
+	</sql>
+</mapper>
